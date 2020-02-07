@@ -1,0 +1,206 @@
+﻿
+@{
+    ViewData["Title"] = "ClienteJSPDF";
+}
+
+<html>
+<head>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <!--<link href="~/css/invoice.css" type="text/css" rel="stylesheet" />-->
+    <script type="text/javascript" src="~/js/jspdf/jspdf.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="list-group-item">
+            <label class="badge badge-info">Busca Nome</label>
+            <input id="novoNome" onkeydown="busca()" />
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="javascript:demoFromHTML()">Gerar PDF</button>
+        <div id="customers">
+            <img class="img-fluid" src="~/img/logo.png" width="500" />
+            <h1>Relatório Geral!</h1>
+
+            <table id="tab_customers" class="table">
+                <tr>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Saldo</th>
+                    <th>Data Nascimento</th>
+                </tr>
+            </table>
+
+            <table id="tabelaTeste" class="table">
+                <tr>
+                    <th>Total Clientes</th>
+                    <th>Total Saldo</th>
+                </tr>
+            </table>
+            <table id="tabelaNovoTeste" class="table">
+                <tr>
+                    <th>Teste 1</th>
+                    <th>Teste 2</th>
+                    <th>Teste 3</th>
+                    <th>Teste 4</th>
+                    <th>Teste 5</th>
+                    <th>Teste 6</th>
+                    <th>Teste 7</th>
+                    <th>Teste 8</th>
+                    <th>Teste 9</th>
+                    <th>Teste 10</th>
+
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script src="~/js/jquery/jquery-3.4.1.js"></script>
+    
+    <script>
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("Buscar")",
+            dataType: 'json',
+            success: function (result) {
+                var totalCliente = 0;
+                var totalSaldo = 0;
+                tabela = document.getElementById("tab_customers");
+                $(result).each(function (i) {
+                    totalCliente++;
+                    totalSaldo += result[i].saldo;
+                    linha = tabela.insertRow(-1);
+                    var coluna1 = linha.insertCell(0);
+                    var coluna2 = linha.insertCell(1);
+                    var coluna3 = linha.insertCell(2);
+                    var coluna4 = linha.insertCell(3);
+                    coluna1.innerHTML = result[i].id;
+                    coluna2.innerHTML = result[i].nome;
+                    coluna3.innerHTML = result[i].saldo;
+                    coluna4.innerHTML = result[i].dataNascimento;
+                });
+                tabela2 = document.getElementById("tabelaTeste");
+                linha = tabela2.insertRow(-1);
+                coluna1 = linha.insertCell(0);
+                coluna2 = linha.insertCell(1);
+
+                coluna1.innerHTML = totalCliente;
+                coluna2.innerHTML = totalSaldo;
+            },
+            error: function (result) {
+                alert("Erro!");
+            }
+        });
+        function busca() {
+            $(document).ready(function () {
+                $("#tab_customers").find("tr:gt(0)").remove();
+                $("#tabelaTeste").find("tr:gt(0)").remove();
+                });
+            $.ajax({
+            type: "POST",
+            url: "@Url.Action("Buscar")",
+            dataType: 'json',
+            success: function (result) {
+                var totalCliente = 0;
+                var totalSaldo = 0;
+                tabela = document.getElementById("tab_customers");
+                var n = document.getElementById("novoNome");
+                $(result).each(function (i) {
+                    if (result[i].nome.includes(n.value)) {
+                        totalCliente++;
+                        totalSaldo += result[i].saldo;
+                        linha = tabela.insertRow(-1);
+                        var coluna1 = linha.insertCell(0);
+                        var coluna2 = linha.insertCell(1);
+                        var coluna3 = linha.insertCell(2);
+                        var coluna4 = linha.insertCell(3);
+                        coluna1.innerHTML = result[i].id;
+                        coluna2.innerHTML = result[i].nome;
+                        coluna3.innerHTML = result[i].saldo;
+                        coluna4.innerHTML = result[i].dataNascimento;
+                    }
+                });
+                tabela2 = document.getElementById("tabelaTeste");
+                linha = tabela2.insertRow(-1);
+                coluna1 = linha.insertCell(0);
+                coluna2 = linha.insertCell(1);
+
+                coluna1.innerHTML = totalCliente;
+                coluna2.innerHTML = totalSaldo;
+            },
+            error: function (result) {
+                alert("Erro!");
+            }
+            });
+        }
+
+    </script>
+    <script>
+        function demoFromHTML() {
+            var pdf = new jsPDF('l', 'pt', 'a4');
+            source = $('#customers')[0];
+            specialElementHandlers = {
+                '#bypassme': function (element, renderer) {
+                    return true
+                }
+            };
+            margins = {
+                bottom: 10,
+                top: 10,
+                left: 10,
+                right: 10
+            };
+            pdf.line(20, 20, 500, 20);
+            pdf.fromHTML(
+                source, // HTML string or DOM elem ref.
+                margins.left, // x coord
+                margins.top, {// y coord
+                'width': margins.width, // max width of content on PDF
+                'elementHandlers': specialElementHandlers
+            },
+                function (dispose) {
+                    pdf.output('datauri');
+
+                }
+                , margins);
+        }
+    </script>
+</body>
+</html>
+

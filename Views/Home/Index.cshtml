@@ -1,0 +1,290 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<html>
+<head>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/css/paper.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="~/lib/tempusdominus-date/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+</head>
+<body class="A4">
+    <div class="group">
+        <form class="list-group-item" onsubmit="filtrarTabela(event)" id="formulario-filtro">
+            <button type="button" class="btn btn-primary" onclick="Gerar('customers')">Imprimir</button><br />
+            <label>Data Inicial</label>
+            <div class="input-group date" id="ContainerDataInicial" data-target-input="nearest">
+                <input type="text" class="form-control form-control datetimepicker-input" data-target="#ContainerDataInicial" autocomplete="off" data-toggle="datetimepicker" name="DataInicial" id="DataInicial" value="01/01/2019">
+                <div class="input-group-append" data-target="#ContainerDataInicial" data-toggle="datetimepicker">
+                    <div class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <label>Data Final</label>
+            <div class="input-group date" id="ContainerDataFinal" data-target-input="nearest">
+                <input type="text" class="form-control form-control datetimepicker-input" data-target="#ContainerDataFinal" autocomplete="off" data-toggle="datetimepicker" name="DataFinal" id="DataFinal" value="31/12/2020">
+                <div class="input-group-append" data-target="#ContainerDataFinal" data-toggle="datetimepicker">
+                    <div class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <select id="TipoData">
+                <option value="1" selected="selected">Lancamento</option>
+                <option value="2">Vencimento</option>
+            </select><br />
+            <br />
+            <label>Ordenar por:</label><br />
+            <select id="TipoOrdem">
+                <option value="Codigo" selected="selected">Código</option>
+                <option value="Valor">Valor</option>
+                <option value="Multa">Multa</option>
+                <option value="Juros">Juros</option>
+            </select><br />
+            <br />
+            <label>Status</label><br />
+            <select id="status" name="Status">
+                <option value="">Nenhum</option>
+                <option value="0">Aberto</option>
+                <option value="0.1">Vencido</option>
+                <option value="1">Liquidado</option>
+                <option value="2">Cancelado</option>
+            </select><br /><br />
+            <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+        </form>
+        <section id="sheet" class="sheet padding-10mm">
+            <div id="customers" style="align-items:center">
+                <table>
+                    <tr style="text-align:center">
+                        <td><img class="img-fluid" src="~/img/logo.jpg" width="100" height="100" id="logo" /></td>
+                        <td style="text-align: left"><p><b>Nome Fantasia: </b>Teste exemplo<br /><b>Razão Social: </b>teste2 exemplo2<br /><b>Endereço: </b>teste3 exemplo3<br /><b>Telefone: </b>(99)9999-9999</p><p id="periodo"></p></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-size: 25px;"><b>Relatório Listagem de Conta Pagar</b></td>
+                    </tr>
+                </table>
+                <table id="tab_customers" class="w-100 text-center mb-1">
+                    <tr>
+                        <th id="cod" style="border-top: 1px dashed; border-bottom: 1px dashed">Código</th>
+                        <th id="des" style="border-top: 1px dashed; border-bottom: 1px dashed">Descrição</th>
+                        <th id="sta" style="border-top: 1px dashed; border-bottom: 1px dashed">Status</th>
+                        <th id="lan" style="border-top: 1px dashed; border-bottom: 1px dashed">Data Lanç.</th>
+                        <th id="ven" style="border-top: 1px dashed; border-bottom: 1px dashed">Data Venc.</th>
+                        <th id="val" style="border-top: 1px dashed; border-bottom: 1px dashed">Valor</th>
+                        <th id="mul" style="border-top: 1px dashed; border-bottom: 1px dashed">Multa</th>
+                        <th id="jur" style="border-top: 1px dashed; border-bottom: 1px dashed">Juros</th>
+                        <th id="tot" style="border-top: 1px dashed; border-bottom: 1px dashed;text-align: right">Total</th>
+                    </tr>
+                </table>
+                <table id="tabelaTeste" style="margin:auto; float:right">
+                    <tr>
+                        <th style="border-top: 1px dashed; border-left: 1px dashed; border-bottom: 1px dashed; text-align: left; padding-right: 10px;">Quantidade de Contas</th>
+                        <td style="border-bottom: 1px dashed;border-top: 1px dashed;border-right: 1px dashed;" id="qtdeConta"></td>
+                    </tr>
+                    <tr>
+                        <th style="border-bottom: 1px dashed; border-left: 1px dashed; text-align: left; padding-right: 10px">Valor Total sem Juros/Multa</th>
+                        <td style="border-bottom: 1px dashed;border-right: 1px dashed;" id="total"></td>
+                    </tr>
+                    <tr>
+                        <th style="border-bottom: 1px dashed; border-left: 1px dashed; text-align: left; padding-right: 10px;">Valor Total de Juros</th>
+                        <td style="border-bottom: 1px dashed;border-right: 1px dashed;" id="totJuros"></td>
+                    </tr>
+                    <tr>
+                        <th style="border-bottom: 1px dashed; border-left: 1px dashed; text-align:left; padding-right: 10px;">Valor Total de Multa</th>
+                        <td style="border-bottom: 1px dashed;border-right: 1px dashed;" id="totMulta"></td>
+                    </tr>
+                    <tr>
+                        <th style="border-bottom: 1px dashed; border-left: 1px dashed; text-align:left; padding-right: 10px;font-size: 20px">Total</th>
+                        <td style="border-bottom: 1px dashed;border-right: 1px dashed;" id="totTotal"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/moment/moment.min.js"></script>
+    <script src="~/lib/moment/locales.min.js"></script>
+    <script src="~/lib/tempusdominus-date/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="~/lib/printjs/js/print.min.js"></script>
+    <script>
+        var filtro = '';
+
+        $(document).ready(function() {
+            moment.locale("pt-br");
+
+            $('#ContainerDataInicial,#ContainerDataFinal').datetimepicker({
+                format: 'L',
+                locale: 'pt-br',
+                useCurrent: false
+            });
+        });
+
+        //#region GerarPDF
+        function Gerar(nomeDiv) {
+            //printJS(, 'html');
+
+            printJS({
+                printable: `${nomeDiv}`,
+                type: 'html',
+                style: '#tab_customers {width: 100%}'
+            });
+
+            //window.location.reload();
+        }
+        //#endregion
+
+        //#region Filtro
+        function filtrarTabela(event) {
+            const formulario = $("#formulario-filtro").find(":input");
+            filtro = '';
+            for (let i = 0; i < formulario.length; i++) {
+                const campo = formulario[i];
+                const valorCampo = campo.value;
+                if (valorCampo) {
+                    if (filtro.length > 0 && campo.name) {
+                        filtro += ' && ';
+                    }
+                    if (["DataInicial", "DataFinal"].includes(campo.name)) {
+                        var tipoData = $("#TipoData").val() === "1" ? "DataLancamento" : "DataVencimento";
+                        const operador = campo.name === "DataInicial" ? `>=` : `<=`;
+                        const partesValorDigitado = valorCampo.split("/");
+                        filtro += `DataLancamento.Date ${operador} DateTime(${partesValorDigitado[2]}, ${partesValorDigitado[1]}, ${partesValorDigitado[0]})`;
+                    } else if (campo.name === 'Status') {
+                        if (valorCampo === "0" || valorCampo === "0.1") {
+                            if (valorCampo === "0.1") {
+                                const hoje = moment().format('L');
+                                const partesHoje = hoje.split("/");
+                                const filtroVencimento = `DateTime(${partesHoje[2]}, ${partesHoje[1]}, ${partesHoje[0]}) > DataVencimento`;
+                                filtro += `Status.Equals(0) && ` + filtroVencimento;
+                            }
+                            else {
+                                filtro += `${campo.name}.Equals(${valorCampo})`;
+                            }
+                        }
+                        else {
+                            filtro = `${campo.name}.Equals(${valorCampo})`;
+                        }
+                    }
+                }
+            }
+
+            buscar();
+            if (event) {
+                event.preventDefault();
+            }
+            return false;
+        }
+        //#endregion
+
+        //#region buscar
+        function buscar() {
+            var dataInicial = document.getElementById('DataInicial');
+            var dataFinal = document.getElementById('DataFinal');
+            var ordem = document.getElementById('TipoOrdem').value;
+            console.log(ordem)
+            $("#tab_customers").find("tr:gt(0)").remove();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Buscar")",
+                data: { filtro: filtro, ordem: ordem},
+                dataType: 'json',
+                success: function (resultado) {
+                    var totalConta = 0;
+                    var valorConta = 0;
+                    var valorJuros = 0;
+                    var valorMulta = 0;
+                    var tabela = document.getElementById("tab_customers");
+
+                    $.each(resultado, function (index, item) {
+                        totalConta++;
+                        valorConta += item.Valor;
+                        valorJuros += item.Juros;
+                        valorMulta += item.Multa;
+                        const linha = tabela.insertRow(-1);
+                        linha.style.textAlign = "center";
+                        linha.style.fontSize = '13px';
+                        if(totalConta%2===0)
+                            linha.style.backgroundColor = "#DCDCDC";
+                        const coluna1 = linha.insertCell(0);
+                        const coluna2 = linha.insertCell(1);
+                        const coluna3 = linha.insertCell(2);
+                        const coluna4 = linha.insertCell(3);
+                        const coluna5 = linha.insertCell(4);
+                        const coluna6 = linha.insertCell(5);
+                        const coluna7 = linha.insertCell(6);
+                        const coluna8 = linha.insertCell(7);
+                        const coluna9 = linha.insertCell(8);
+                        coluna1.innerHTML = item.Codigo;
+                        coluna2.innerHTML = item.Descricao;
+                        coluna4.innerHTML = item.DataLancamento.split(" ")[0];
+                        coluna5.innerHTML = item.DataVencimento.split(" ")[0];
+                        coluna6.innerHTML = item.Valor.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                        coluna7.innerHTML = item.Multa.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                        coluna8.innerHTML = item.Juros.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                        coluna9.innerHTML = (item.Valor + item.Multa + item.Juros).toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                        coluna9.style.textAlign = "right";
+                        coluna3.innerHTML = statusContaPagar(item.Status, item.DataVencimento);
+                    });
+                    document.getElementById('qtdeConta').innerHTML = totalConta;
+                    document.getElementById('total').innerHTML = valorConta.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                    document.getElementById('totJuros').innerHTML = valorJuros.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                    document.getElementById('totMulta').innerHTML = valorMulta.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
+                    document.getElementById('totTotal').innerHTML = "<b>"+(valorConta + valorJuros + valorMulta).toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2})+"</b>";
+                    document.getElementById('periodo').innerHTML = "Período: " + dataInicial.value + " até " + dataFinal.value;
+                },
+                error: function (result) {
+                    alert("Erro!");
+                }
+            });
+        }
+        //#endregion
+
+        //#region InidicarStatus
+        function statusContaPagar(status, data) {
+            const parteDataVencimento = data.split(" ")[0].split("/");
+            const dataVencimento = new Date(parteDataVencimento[2], parteDataVencimento[1] - 1, parteDataVencimento[0]);
+            const hoje = new Date();
+            if (status === 0 || status === 0.1) {
+                if (hoje > dataVencimento) {
+                    //return `<span class="badge badge-warning" style="min-width: 80px;">Vencida</span>`;
+                    return `<span style="min-width: 80px;">Vencida</span>`;
+                } else {
+                    //return `<span class="badge badge-primary" style="min-width: 80px;">Em aberto</span>`;
+                    return `<span style="min-width: 80px;">Em aberto</span>`;
+                }
+            } else if (status === 1) {
+                //return `<span class="badge badge-success" style="min-width: 80px;">Liquidado</span>`;
+                return `<span style="min-width: 80px;">Liquidado</span>`;
+            } else if (status === 2) {
+                //return `<span class="badge badge-danger" style="min-width: 80px;">Cancelado</span>`;
+                return `<span style="min-width: 80px;">Cancelado</span>`;
+            }
+        }
+        //#endregion
+    </script>
+    <style>
+        #customers {
+            position: relative;
+            width: 100%;
+            /*background-color: peachpuff;*/
+            float: left;
+        }
+
+        #formulario-filtro {
+            position: relative;
+            width: 15%;
+            /*background-color: lightblue;*/
+            float: left;
+        }
+
+        .group {
+            zoom: 1; /* For IE 6/7 (trigger hasLayout) */
+        }
+    </style>
+</body>
+</html>

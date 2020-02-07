@@ -1,0 +1,236 @@
+﻿
+@{
+    ViewData["Title"] = "ClientePDFmake";
+}
+
+<!--Esse aqui precisa apenas dos scripts da pasta pdfmake -->
+<html>
+<head>
+    <!--<link href="~/css/invoice.css" type="text/css" rel="stylesheet" />-->
+    <script src="~/js/jquery/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="~/pdfmake/browser.js"></script>
+    <script type="text/javascript" src="~/pdfmake/pdfmake.js"></script>
+    <script type="text/javascript" src="~/pdfmake/pdfmake.min.js"></script>
+    <script type="text/javascript" src="~/pdfmake/vfs_fonts.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="list-group-item">
+            <label class="badge badge-info">Busca Nome</label>
+            <input id="novoNome" onkeydown="busca()" />
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="abrirPDF()">Abrir PDF</button>
+        <button type="button" class="btn btn-primary" onclick="baixarPDF()">Baixar PDF</button>
+        <button type="button" class="btn btn-primary" onclick="imprimirPDF()">Imprimir PDF</button><br /><br />
+        <div id="customers">
+
+            <table>
+                <tr>
+                    <th width="100px"><img class="img-fluid" src="~/img/unitech.png" width="100" id="logo" /></th>
+                    <th width="300px"><p><b>Nome Fantasia:</b>Teste exemplo<br /><b>Razão Social: </b>teste2 exemplo2<br /><b>Endereço:</b>teste3 exemplo3<br /><b>Telefone:</b>teste4 exemplo4</p></th>
+                    <th width="200px"><p><b>Tipo Conta: Contas a Receber</b><br />xx/xx/xxxx :: hh:mm</p></th>
+                </tr>
+            </table>
+            <h1>Relatório Geral!</h1>
+
+            <table id="tab_customers" class="table">
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                    <th>Data Lanç.</th>
+                    <th>Data Venc.</th>
+                    <th>Valor(R$)</th>
+                    <th>Multa</th>
+                    <th>Juros</th>
+                    <th>Status</th>
+                </tr>
+            </table>
+
+            <table id="tabelaTeste" class="table">
+                <tr>
+                    <th>Total Clientes</th>
+                    <th>Total Saldo</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("Buscar")",
+            dataType: 'json',
+            success: function (result) {
+                var totalCliente = 0;
+                var totalSaldo = 0;
+                tabela = document.getElementById("tab_customers");
+                $(result).each(function (i) {
+                    totalCliente++;
+                    totalSaldo += result[i].saldo;
+                    linha = tabela.insertRow(-1);
+                    var coluna1 = linha.insertCell(0);
+                    var coluna2 = linha.insertCell(1);
+                    var coluna3 = linha.insertCell(2);
+                    var coluna4 = linha.insertCell(3);
+                    var coluna5 = linha.insertCell(4);
+                    var coluna6 = linha.insertCell(5);
+                    var coluna7 = linha.insertCell(6);
+                    var coluna8 = linha.insertCell(7);
+                    coluna1.innerHTML = result[i].código;
+                    coluna2.innerHTML = result[i].descrição;
+                    coluna3.innerHTML = result[i].dataLancamento;
+                    coluna4.innerHTML = result[i].dataVencimento;
+                    coluna5.innerHTML = result[i].valor;
+                    coluna6.innerHTML = result[i].multa;
+                    coluna7.innerHTML = result[i].juros;
+                    coluna8.innerHTML = result[i].status;
+                });
+                tabela2 = document.getElementById("tabelaTeste");
+                linha = tabela2.insertRow(-1);
+                coluna1 = linha.insertCell(0);
+                coluna2 = linha.insertCell(1);
+
+                coluna1.innerHTML = totalCliente;
+                coluna2.innerHTML = totalSaldo;
+            },
+            error: function (result) {
+                alert("Erro!");
+            }
+        });
+        function busca() {
+            $(document).ready(function () {
+                $("#tab_customers").find("tr:gt(0)").remove();
+                $("#tabelaTeste").find("tr:gt(0)").remove();
+                });
+            $.ajax({
+            type: "POST",
+            url: "@Url.Action("Buscar")",
+            dataType: 'json',
+            success: function (result) {
+                var totalCliente = 0;
+                var totalSaldo = 0;
+                tabela = document.getElementById("tab_customers");
+                var n = document.getElementById("novoNome");
+                $(result).each(function (i) {
+                    if (result[i].nome.includes(n.value)) {
+                        totalCliente++;
+                        totalSaldo += result[i].saldo;
+                        linha = tabela.insertRow(-1);
+                        var coluna1 = linha.insertCell(0);
+                        var coluna2 = linha.insertCell(1);
+                        var coluna3 = linha.insertCell(2);
+                        var coluna4 = linha.insertCell(3);
+                        var coluna5 = linha.insertCell(4);
+                        var coluna6 = linha.insertCell(5);
+                        var coluna7 = linha.insertCell(6);
+                        var coluna8 = linha.insertCell(7);
+                        coluna1.innerHTML = result[i].código;
+                        coluna2.innerHTML = result[i].descrição;
+                        coluna3.innerHTML = result[i].dataLancamento;
+                        coluna4.innerHTML = result[i].dataVencimento;
+                        coluna5.innerHTML = result[i].valor;
+                        coluna6.innerHTML = result[i].multa;
+                        coluna7.innerHTML = result[i].juros;
+                        coluna8.innerHTML = result[i].status;
+                    }
+                });
+                tabela2 = document.getElementById("tabelaTeste");
+                linha = tabela2.insertRow(-1);
+                coluna1 = linha.insertCell(0);
+                coluna2 = linha.insertCell(1);
+
+                coluna1.innerHTML = totalCliente;
+                coluna2.innerHTML = totalSaldo;
+            },
+            error: function (result) {
+                alert("Erro!");
+            }
+            });
+        }
+
+    </script>
+    <script>
+        function abrirPDF() {
+            converterImg();
+            var val = htmlToPdfmake(document.getElementById('customers').innerHTML);
+            alert(val);
+            var dd = {
+                content: val,
+                pageOrientation: 'landscape'
+            };
+            pdfMake.createPdf(dd).open();
+        };
+        function baixarPDF() {
+            converterImg();
+            var val = htmlToPdfmake(document.getElementById('customers').innerHTML);
+            var dd = {
+                userPassword: '123',
+                ownerPassword: '123456',
+
+                permissions: {
+                    printing: 'highResolution', //'lowResolution'
+                    modifying: true,
+                    copying: false, //Se permite coipar texto ou graficos do pdf
+                    annotating: true,
+                    fillingForms: true,
+                    contentAccessibility: true,
+                    documentAssembly: true
+                },
+                watermark: { 
+                    text: 'Test watermark',
+                    color: 'blue', 
+                    opacity: 0.1,
+                    bold: false,
+                    italics: false
+                }, 
+                content: val,
+                pageOrientation: 'landscape'
+            };
+            pdfMake.createPdf(dd).download();
+        };
+
+        function imprimirPDF() {
+            converterImg();
+            var val = htmlToPdfmake(document.getElementById('customers').innerHTML);
+            var dd = {
+                userPassword: '123',
+                ownerPassword: '123456',
+
+                permissions: {
+                    printing: 'highResolution', //'lowResolution'
+                    modifying: true,
+                    copying: false, //Se permite coipar texto ou graficos do pdf
+                    annotating: true,
+                    fillingForms: true,
+                    contentAccessibility: true,
+                    documentAssembly: true
+                },
+                watermark: { 
+                    text: 'Test watermark',
+                    color: 'blue', 
+                    opacity: 0.1,
+                    bold: false,
+                    italics: false
+                }, 
+                content: val,
+                pageOrientation: 'landscape'
+            };
+            pdfMake.createPdf(dd).print();
+        };
+    </script>
+    <script>
+        function converterImg() {
+            var c = document.createElement('canvas');
+            var img = document.getElementById('logo');
+            c.height = img.naturalHeight;
+            c.width = img.naturalWidth;
+            var ctx = c.getContext('2d');
+
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            img.src = c.toDataURL();
+        }
+        
+    </script>
+</body>
+</html>
