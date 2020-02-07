@@ -72,8 +72,7 @@
                         <th id="cod" style="border-top: 1px dashed; border-bottom: 1px dashed">Código</th>
                         <th id="des" style="border-top: 1px dashed; border-bottom: 1px dashed">Descrição</th>
                         <th id="sta" style="border-top: 1px dashed; border-bottom: 1px dashed">Status</th>
-                        <th id="lan" style="border-top: 1px dashed; border-bottom: 1px dashed">Data Lanç.</th>
-                        <th id="ven" style="border-top: 1px dashed; border-bottom: 1px dashed">Data Venc.</th>
+                        <th id="ven" style="border-top: 1px dashed; border-bottom: 1px dashed">Vencimento</th>
                         <th id="val" style="border-top: 1px dashed; border-bottom: 1px dashed">Valor</th>
                         <th id="mul" style="border-top: 1px dashed; border-bottom: 1px dashed">Multa</th>
                         <th id="jur" style="border-top: 1px dashed; border-bottom: 1px dashed">Juros</th>
@@ -150,7 +149,6 @@
                         filtro += ' && ';
                     }
                     if (["DataInicial", "DataFinal"].includes(campo.name)) {
-                        var tipoData = $("#TipoData").val() === "1" ? "DataLancamento" : "DataVencimento";
                         const operador = campo.name === "DataInicial" ? `>=` : `<=`;
                         const partesValorDigitado = valorCampo.split("/");
                         filtro += `DataLancamento.Date ${operador} DateTime(${partesValorDigitado[2]}, ${partesValorDigitado[1]}, ${partesValorDigitado[0]})`;
@@ -213,15 +211,13 @@
                         const coluna1 = linha.insertCell(0);
                         const coluna2 = linha.insertCell(1);
                         const coluna3 = linha.insertCell(2);
-                        const coluna4 = linha.insertCell(3);
-                        const coluna5 = linha.insertCell(4);
-                        const coluna6 = linha.insertCell(5);
-                        const coluna7 = linha.insertCell(6);
-                        const coluna8 = linha.insertCell(7);
-                        const coluna9 = linha.insertCell(8);
+                        const coluna5 = linha.insertCell(3);
+                        const coluna6 = linha.insertCell(4);
+                        const coluna7 = linha.insertCell(5);
+                        const coluna8 = linha.insertCell(6);
+                        const coluna9 = linha.insertCell(7);
                         coluna1.innerHTML = item.Codigo;
                         coluna2.innerHTML = item.Descricao;
-                        coluna4.innerHTML = item.DataLancamento.split(" ")[0];
                         coluna5.innerHTML = item.DataVencimento.split(" ")[0];
                         coluna6.innerHTML = item.Valor.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
                         coluna7.innerHTML = item.Multa.toLocaleString("pt-BR", {style:"currency",currency:"BRL", minimumFractionDigits: 2});
